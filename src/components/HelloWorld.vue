@@ -1,59 +1,109 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-router" target="_blank" rel="noopener">router</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div>
+    <v-dialog
+      v-model="dialog"
+      persistent
+      max-width="600px"
+      min-width="360px"
+      :retain-focus="false"
+    >
+      <div>
+        <div style="text-align: center; color:white; background:#2C3A47">
+          <h1 class="">LOGIN</h1>
+        </div>
+        <v-card class="px-4">
+          <v-card-text>
+            <v-form ref="loginForm" v-model="valid" lazy-validation>
+              <v-row>
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="loginEmail"
+                    label="Username"
+                    required
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="loginPassword"
+                    :append-icon="show1 ? 'eye' : 'eye-off'"
+                    :rules="[rules.required, rules.min]"
+                    :type="show1 ? 'text' : 'password'"
+                    name="input-10-1"
+                    label="Password"
+                    hint="At least 8 characters"
+                    counter
+                    @click:append="show1 = !show1"
+                  ></v-text-field>
+                </v-col>
+                <v-col class="d-flex" cols="12" sm="6" xsm="12"> </v-col>
+                <v-spacer></v-spacer>
+                <v-col class="d-flex" cols="12" sm="3" xsm="12" align-end>
+                  <v-btn
+                    x-large
+                    block
+                    :disabled="!valid"
+                    color="success"
+                    @click="validate"
+                  >
+                    Login
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </div>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
-}
-</script>
+  name: "HelloWorld",
+  computed: {
+    passwordMatch() {
+      return () => this.password === this.verify || "Password must match";
+    },
+  },
+  methods: {
+    validate() {
+      // if (this.$refs.loginForm.validate()) {
+      //   // submit form to server/API here...
+      // }
+      if (this.loginPassword === "admin" && this.loginEmail === "admin") {
+        this.dialog = false;
+      }
+    },
+    reset() {
+      this.$refs.form.reset();
+    },
+    resetValidation() {
+      this.$refs.form.resetValidation();
+    },
+  },
+  data: () => ({
+    notlogin: false,
+    dialog: true,
+    tab: 0,
+    tabs: [{ name: "Login", icon: "mdi-account" }],
+    valid: true,
+    verify: "",
+    loginPassword: "",
+    loginEmail: "",
+    loginEmailRules: [
+      (v) => !!v || "Required",
+      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+    ],
+    emailRules: [
+      (v) => !!v || "Required",
+      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+    ],
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
+    show1: false,
+    rules: {
+      required: (value) => !!value || "Required.",
+      min: (v) => (v && v.length >= 2) || "Min 8 characters",
+    },
+  }),
+};
+</script>
