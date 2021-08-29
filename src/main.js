@@ -5,6 +5,7 @@ import vuetify from './plugins/vuetify';
 import axios from 'axios';
 import Loading from 'vue-loading-overlay';
 import Toast from "vue-toastification";
+import VueApexCharts from 'vue-apexcharts';
 import "vue-toastification/dist/index.css";
 Vue.use(Toast, {
     transition: "Vue-Toastification__fade",
@@ -23,6 +24,7 @@ Vue.use(Toast, {
 });
 Vue.use(axios);
 Vue.use(Loading);
+Vue.use(VueApexCharts);
 Vue.config.productionTip = false
 
 new Vue({

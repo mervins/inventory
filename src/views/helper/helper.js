@@ -55,10 +55,17 @@ export default {
             });
         },
         date_today() {
-            // var currentDate = new Date();
-            // alert(currentDate);
             var currentDateWithFormat = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
             console.log(currentDateWithFormat);
+        },
+        get_weekly(){
+            var list_date = [];
+            var currentDate = new Date();
+            for(var x = 1; x <= 7; x++){
+                var nextday = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay() + x));
+                list_date.push(nextday.toJSON().slice(0, 10).replace(/-/g, '-'));
+            } 
+            console.log(list_date);
         },
         async get_product() {
             let temp_data = await axios.get('http://127.0.0.1:3308/api/product');

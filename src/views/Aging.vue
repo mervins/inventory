@@ -60,6 +60,29 @@ export default {
         let temp_data =  await axios.get(this.ipaddress+'/api/customer');
         this.customer = temp_data.data; 
       },  
+      return_product(){
+    //     for(var x = 0; x < data_all.length; x++){ 
+    //     for(var y = 0; y < data_all[x].length; y++){
+    //         for(var z = 0; z < collect_all.length; z++){
+    //         if(data_all[x][y].id == collect_all[z].id){
+    //             collect_all[z].value += data_all[x][y].value;
+    //             }
+    //         }
+    //     }
+    // }
+      var collect_data = [{id:1, value:0},{id:2, value:0},{id:3, value:0},{id:4, value:0},{id:5, value:0},];
+      var data_all = [[{id:1, value:20},{id:2, value:0},{id:3, value:0},{id:4, value:0},{id:5, value:40}],];
+      for(var x = 0; x < data_all.length; x++){ 
+          for(var y = 0; y < data_all[x].length; y++){
+              for(var z = 0; z < collect_data.length; z++){
+              if(data_all[x][y].id == collect_data[z].id){
+                  collect_data[z].value += data_all[x][y].value;
+                  console.log(collect_data);
+                  }
+              }
+          } 
+      }
+    }
       
   },
   created(){

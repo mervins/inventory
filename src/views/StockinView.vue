@@ -1,5 +1,5 @@
 <template> 
-    <div class="test">
+    <div class="stview">
        <div class="text-center" v-if="progress">
          <v-progress-circular 
             :size="70"
@@ -210,13 +210,10 @@ methods:{
 }
 </script>
 <style>
-.test { 
-  margin-right: 400px;    
-  border-style: solid;
-  border-color: coral;
-}
-.test{
-    margin:100px;
+.stview{
+    padding:10px;
+    height: 100%;
+    background-color: white !important;
 }
 p{
   font-size: 20px;

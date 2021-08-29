@@ -2,8 +2,10 @@
     <div class="report">
         <center>
             <h1>Generate Reports</h1>
-            <div style="width:500px;">
-                <v-dialog
+            <v-row>
+                <v-col cols="12" md="3"></v-col>
+                <v-col cols="12" md="3">
+                    <v-dialog
                     ref="dialog"
                     :return-value.sync="date"
                     persistent
@@ -21,7 +23,7 @@
                     </template>
                     <v-date-picker v-model="date" scrollable>
                       <v-spacer></v-spacer>
-                      <v-btn text color="primary" @click="modal = false">
+                      <v-btn text color="primary" @click="$refs.dialog.save(new Date().toISOString().substr(0, 10))">
                         Cancel
                       </v-btn>
                       <v-btn
@@ -33,28 +35,146 @@
                       </v-btn>
                     </v-date-picker>
                   </v-dialog>
-            </div>
-            <div>
-                <v-btn  class="pa-2 ma-2 temp_button"  color="primary" dark @click="export_inventory">
-                    Inventory List
-                </v-btn> 
-            </div>
-            <div>
-                <v-btn  class="pa-2 ma-2 temp_button"  color="primary" dark @click="stock_in">
-                    Stock - In
-                </v-btn>
-            </div>
-            <div>
-                <v-btn  class="pa-2 ma-2 temp_button"  color="primary" dark @click="stock_out" >
-                    Stock - Out
-                </v-btn>
-            </div>
-            <!-- <div>
-                <v-btn  class="pa-2 ma-2 temp_button"  color="primary" dark >
-                        Sales
-                </v-btn>
-            </div> -->
+                </v-col>
+                <v-col cols="12" md="3">
+                    <v-select :items="['Inventory','Sales','Stock-in']" label="Reports" required  v-model="select_dp" @change="select_dropdown()"></v-select>
+                </v-col>
+            </v-row>
         </center>
+        <div class="mr-6 ml-6" v-if="select_dp == 'Inventory'"> 
+             <v-row> 
+                <v-col  cols="12" md="8" >
+                    <v-card>
+                        <v-simple-table fixed-header dark>
+                            <template v-slot:default>
+                                <thead>
+                                <tr>  
+                                    <th class="text-left"><h2>No.</h2></th>  
+                                    <th class="text-left"><h2>Description</h2></th> 
+                                    <th class="text-left"><h2>Starting Inventory</h2></th> 
+                                    <th class="text-left"><h2>Loss/Damage</h2></th> 
+                                    <th class="text-left"><h2>Sold</h2></th> 
+                                    <th class="text-left"><h2>Ending Inventory</h2></th> 
+                                </tr>
+                                </thead>
+                                <tbody>
+                                 <tr v-for="(item,key) in list_inventory" :key="key" class="font-weight-regular">
+                                    <td>{{ key }}</td>
+                                    <td> {{ item.description}} </td>
+                                    <td>{{ item.begInv }}</td>
+                                    <td>0</td>
+                                    <td>{{ item.sold }}</td>  
+                                    <td>{{ item.endingInv }}</td>  
+                                </tr>
+                                </tbody>
+                            </template>
+                        </v-simple-table>
+                    </v-card>
+                </v-col>
+                <v-col cols="12" md="4">
+                    <v-card>
+                        <div id="chart">
+                            <VueApexCharts type="pie" width="380" :options="chartOptions" :series="series"></VueApexCharts>
+                        </div>
+                    </v-card>
+                </v-col>
+             </v-row>
+        </div>
+        <div v-else-if="select_dp == 'Sales'">
+            <div class="d-flex flex-row-reverse" > 
+                <v-btn  class="pa-2 ma-2 "  color="primary" @click="addExpenses()" :disabled='disbut'>
+                Add Expenses
+                </v-btn>
+                <div>
+                    <v-text-field label="Cost"  persistent-hint required type="number" v-model="form.cost"></v-text-field>
+                </div>
+                <div class="mr-2">
+                    <v-text-field label="Description"  persistent-hint required type="text" v-model="form.desc"></v-text-field>
+                </div>
+            </div>
+            <div class="mr-6 ml-6">
+             <v-row> 
+                <v-col  cols="12" md="12" >
+                    <v-card>
+                        <v-simple-table fixed-header dark>
+                            <template v-slot:default>
+                                <thead>
+                                <tr>  
+                                    <th class="text-left"><h2>Date</h2></th>  
+                                    <th class="text-left"><h2>Investment</h2></th> 
+                                    <th class="text-left"><h2>Expenses</h2></th> 
+                                    <th class="text-left"><h2>Total</h2></th> 
+                                    <th class="text-left"><h2>Gross Profit</h2></th> 
+                                    <th class="text-left"><h2>Net Profit</h2></th> 
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                  <td>{{date}}</td><td>{{investment}}</td><td>{{totalExpenses}}</td><td>{{totalExpenses+investment}}</td><td>{{total_amount}}</td><td>{{total_amount - (totalExpenses+investment)}}</td>
+                                </tr> 
+                                </tbody>
+                            </template>
+                        </v-simple-table>
+                    </v-card>
+                </v-col>
+             </v-row>
+             <hr>
+            <v-row> 
+                <v-col  cols="12" md="8">
+                    <v-card>
+                        <v-simple-table fixed-header dark>
+                            <template v-slot:default>
+                                <thead>
+                                <tr>  
+                                    <th class="text-left"><h2>Item Name</h2></th>  
+                                    <th class="text-left"><h2>Investment</h2></th> 
+                                    <th class="text-left"><h2>Quantity</h2></th> 
+                                    <th class="text-left"><h2>Amount</h2></th> 
+                                    <th class="text-left"><h2>Total Amount</h2></th> 
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="(item,key) in product" :key="key" class="font-weight-regular">
+                                    <td>{{ item.description }}</td>
+                                    <td> {{ (item.original_price*item.qty)}} </td>
+                                    <td>{{ item.qty }}</td>
+                                    <td>{{ (item.price ) }}</td>
+                                    <td>{{ (item.price*item.qty) }}</td>  
+                                </tr>
+                                <tr>
+                                    <td>Total</td><td>{{investment}}</td><td></td><td></td><td>{{total_amount}}</td>
+                                </tr>
+                                </tbody>
+                            </template>
+                        </v-simple-table>
+                    </v-card>
+                </v-col>
+                <v-col  cols="12" md="4">
+                    <v-card>
+                        <v-simple-table fixed-header dark>
+                            <template v-slot:default>
+                                <thead>
+                                <tr>  
+                                    <th class="text-left"><h2>Description</h2></th> 
+                                    <th class="text-left"><h2>Expenses</h2></th>  
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="(item,key) in expenses" :key="key" class="font-weight-regular">
+                                    <td>{{ item.desc }}</td>
+                                    <td>{{ item.cost }}</td> 
+                                </tr>
+                                <tr>
+                                <td>Total</td><td>{{totalExpenses}}</td>
+                                </tr>
+                                </tbody>
+                            </template>
+                        </v-simple-table>
+                    </v-card>
+                </v-col>
+            </v-row> 
+            </div>
+        </div> 
     </div>
 </template>
 <script>
@@ -63,19 +183,115 @@ import {saveAs} from "file-saver";
 import forEach from "lodash/forEach";
 import axios from 'axios';
 import { Document, Packer, Paragraph, Table,TableRow, TableCell, WidthType,HeadingLevel,AlignmentType,TextRun,Header } from "docx";
+import VueApexCharts from 'vue-apexcharts'
 export default {
     mixins:[Helper],
+    components: {
+          VueApexCharts,
+        },
     data:() => ({
         inventory:[],
-        // stock_in:{},
         stock_out_data:{},
         invents:{},
         date: new Date().toISOString().substr(0, 10),
-        summary_SI:[]
+        summary_SI:[],
+        product:[], 
+        total_amount:0,
+        total_sale:0,
+        form:{cost:'',desc:''},
+        expenses:[],
+        totalExpenses:0,
+        investment:0,
+        series: [60,40],
+          chartOptions: {
+            chart: {
+              width: 380,
+              type: 'pie',
+            },
+            labels: ['Inventory', 'Sold',],
+            dataLabels: {
+              formatter(val, opts) {
+                const name = opts.w.globals.labels[opts.seriesIndex]
+                return [name, val.toFixed(1) + '%']
+              }
+            }, 
+            responsive: [{
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: 200
+                },
+                legend: {
+                  position: 'bottom'
+                }
+              }
+            }]
+          },
+        list_inventory:[],
+        select_dp:'Sales'
     }),
     methods:{ 
-        async export_inventory(){
-            await this.temp_stock_out();
+        inventory_set(){
+            var total_qty_stock = 0;
+            var total_qty_sold = 0;
+            this.list_inventory = []
+            forEach(this.invents.data,(inv)=>{   
+                inv.endingInv = inv.stock;
+                inv.begInv= inv.stock;
+                inv.sold = 0;
+                forEach(this.product,(prod)=>{
+                    if(prod.product_id == inv.product_id){
+                        inv.endingInv  = parseFloat(inv.stock);
+                        inv.sold = parseFloat(prod.qty)  
+                        inv.begInv = parseFloat(inv.sold) + parseFloat(inv.endingInv); 
+                    }
+                })   
+                this.list_inventory.push(inv);
+            }) 
+            forEach(this.list_inventory,(list)=>{
+                total_qty_sold = parseFloat(total_qty_sold) + parseFloat(list.sold);
+                total_qty_stock = parseFloat(total_qty_stock) + parseFloat(list.begInv);
+            })
+            console.log((total_qty_sold) + " " + total_qty_stock);
+            var result = parseFloat(total_qty_sold/total_qty_stock)*100;
+            var sold = result.toFixed(2); 
+            var stock = 100 - sold; 
+            this.series = [parseInt(stock),parseInt(sold)];
+            console.log(this.series)
+       
+        },
+        select_dropdown(){
+            // if(this.select_dp == 'Inventory'){ 
+            //      setTimeout(() =>, 100);  
+              
+            //}
+            //else if(this.select_dp == 'Sales'){
+                this.stock_out();
+                // this.count_total_andSale(); 
+                // this.inventory_set();
+            //}
+            
+        },
+        addExpenses(){
+            this.expenses.push(this.form);
+            this.form = Object.assign({desc:'',cost:0})
+            var totalExpe = 0;
+            forEach(this.expenses,(expense)=>{
+                totalExpe = parseFloat(totalExpe) + parseFloat(expense.cost);
+            })
+            this.totalExpenses = totalExpe;
+        },
+        count_total_andSale(){ 
+            this.total_amount = 0;
+            this.investment = 0; 
+            forEach(this.product, (x)=>{
+                var sale_price = x.qty * parseFloat(x.price);
+                var orig_price = x.qty * parseFloat(x.original_price);
+                this.total_amount = sale_price + this.total_amount; 
+                this.investment = orig_price + this.investment;
+            })     
+        },
+        async export_inventory(){ 
         //this.invents.then((data)=>{  
                 // let temp_data = data;
                 const temp_inventory = this.invents.data; 
@@ -161,26 +377,46 @@ export default {
          async stock_out(){ 
             let temp = await axios.get(this.ipaddress+'/api/stockoutcal/'+this.date); 
             let temp_all_trans = []; 
-            let temp_debt = [];
+            let temp_collect_product_id = []; 
+            let collect_product = [];
             console.log(temp)
-            forEach(temp.data, (item)=>{
-                let temp = JSON.parse(item.data);    
-                forEach(temp.product,(x)=>{   //merge all product from stockout
-                        Object.assign(x,{customer:item.Customer.name,panel_name:item.Track.agent}) 
-                }); 
-                temp_debt.push(Object.assign(temp.payment_method,{customer:item.Customer.name,panel_name:item.Track.agent,total_amount:item.total_amount}) );
-                temp_all_trans.push(...temp.product);
+            forEach(temp.data, (item)=>{ //collect all product_id(s) and product
+                var temp_decode = JSON.parse(item.data);
+                forEach(temp_decode.product,(product)=>{
+                    temp_collect_product_id.push(product.product_id); 
+                    collect_product.push(product)
+                })
             }); 
-             console.log(temp_debt) 
-            // var doc = new Document(); 
-            // // forEach(temp.data, (item)=>{
-            // //     doc = this.export_data_stockout(item,doc)
-            // // });   
-            // doc = this.export_data_stockout(temp_all_trans,doc)
+            var collect_product_id = temp_collect_product_id.filter((item, index) => temp_collect_product_id.indexOf(item) === index); //remove duplicate ids
+            forEach(collect_product_id,(id)=>{temp_all_trans.push({product_id:id, description:'', qty:0, price:0 , original_price:0}) }) // set format in transaction data
+            var i = 0;
+            forEach(collect_product_id,(id)=>{ // liquidate quantity
+                forEach(collect_product,(item)=>{
+                   if(item.product_id == id){
+                       temp_all_trans[i].description = item.name;
+                       temp_all_trans[i].price = item.price;
+                       temp_all_trans[i].qty = parseFloat(item.quantity) + parseFloat(temp_all_trans[i].qty);
+                   }
+                }) 
+                i++;
+            }) 
+            forEach(this.invents.data,(prod)=>{ // get the original price
+                forEach(temp_all_trans,(trans)=>{
+                    if(prod.product_id == trans.product_id){
+                        trans.original_price = prod.price;
+                    }
+                })
+            })
+            console.log(temp_all_trans); 
+            this.product = temp_all_trans; 
+            // var doc = new Document();  
+            // this.export_data_stockout(temp_all_trans,doc)
             // Packer.toBlob(doc).then((blob) => {
             //     console.log(blob);
             //     saveAs(blob,"Stockout.docx");
             // });   
+            await this.count_total_andSale(); 
+            await this.inventory_set();
         },
         async stock_in(){
             let temp = await axios.get(this.ipaddress+'/api/stockincal/'+this.date);
@@ -195,70 +431,85 @@ export default {
                     temp_all_trans.push(...temp);
                 }); 
             console.log(temp_all_trans);
-            var doc = new Document(); 
-            //  forEach(temp.data, (item)=>{
-            //      doc = this.export_data_stockin(temp_all_trans,doc)
-            //  }); 
-            doc = this.export_data_stockin(temp_all_trans,doc)
-            Packer.toBlob(doc).then((blob) => {
-                console.log(blob);
-                saveAs(blob,"Stockin.docx");
-            }); 
-            // await this.summary_stock_in(temp);
+            if(temp_all_trans.length > 0){
+                var doc = new Document();  
+                doc = this.export_data_stockin(temp_all_trans,doc)
+                Packer.toBlob(doc).then((blob) => {
+                    console.log(blob);
+                    saveAs(blob,"Stockin.docx");
+                }); 
+            }else{
+                alert('No Transaction')
+            }
         },
-        export_data_stockout(item,doc){  
-            console.log(item);
-             var temp_data = item;
-                const table = new Table({
-                    rows: temp_data.map((item)=>{
-                        return new TableRow({
-                            children:[
-                                new TableCell({  
-                                    width: { size: 100 / 3, type: WidthType.PERCENTAGE }, 
-                                    children: [new Paragraph({bold: true, text: item.customer,heading: HeadingLevel.HEADING_3, alignment: AlignmentType.CENTER, })],
-                                }),
-                                new TableCell({  
-                                    width: { size: 100 / 3, type: WidthType.PERCENTAGE }, 
-                                    children: [new Paragraph({bold: true, text:  item.panel_name,heading: HeadingLevel.HEADING_3, alignment: AlignmentType.CENTER, })],
-                                }),
-                                new TableCell({  
-                                    width: { size: 100 / 3, type: WidthType.PERCENTAGE }, 
-                                    children: [new Paragraph({bold: true, text: item.name,heading: HeadingLevel.HEADING_3, alignment: AlignmentType.CENTER, })],
-                                }),
-                                new TableCell({  
-                                    width: { size: 100 / 3, type: WidthType.PERCENTAGE },
-                                children: [new Paragraph({bold: true, text: item.price, heading: HeadingLevel.HEADING_3, alignment: AlignmentType.CENTER, })],
-                                }),
-                                new TableCell({  
-                                    width: { size: 100 / 3, type: WidthType.PERCENTAGE },
-                                    children: [new Paragraph({bold: true, text: item.quantity, heading: HeadingLevel.HEADING_3, alignment: AlignmentType.CENTER, })],
-                                }),
-                                new TableCell({  
-                                    width: { size: 100 / 3, type: WidthType.PERCENTAGE },
-                                    children: [new Paragraph({bold: true, text: 'P ' +this.separator_thousand(item.total) , heading: HeadingLevel.HEADING_3, alignment: AlignmentType.CENTER, })],
-                                }),
-                            ],  
-                        });
-                    }),
-                });
-                const heading = ["Customer","Agent", "Description", "Price","Quantity","Subtotal"];
+        export_data_stockout(data,doc){   
+            var temp_data = data; 
+            console.log(temp_data);  
+            // const table = 
+            //         new Table({
+            //             rows: temp_data.map((item)=>{ 
+            //                 return new TableRow({
+            //                     children:[  
+            //                         //new Paragraph({bold: true, text: item.client,heading: HeadingLevel.HEADING_3, alignment: AlignmentType.CENTER, }),
+            //                         new TableCell({  
+            //                         width: { size: 100 / 3, type: WidthType.PERCENTAGE }, 
+            //                         children: [new Paragraph({bold: true, text: item.id,heading: HeadingLevel.HEADING_3, alignment: AlignmentType.CENTER, })],
+            //                         }),
+            //                         new TableCell({  
+            //                             width: { size: 100 / 3, type: WidthType.PERCENTAGE }, 
+            //                             children: [
+            //                                  //new Paragraph({bold: true, text: item.client,heading: HeadingLevel.HEADING_3, alignment: AlignmentType.CENTER, }),
+            //                                 // item.product.map((list)=>{
+            //                                 new TableRow({
+            //                                     children:[  
+            //                                         new TableCell({
+            //                                             width: { size: 100 / 3, type: WidthType.PERCENTAGE }, 
+            //                                             children:[ 
+            //                                                     new Paragraph({bold: true, text: item.client,heading: HeadingLevel.HEADING_3, alignment: AlignmentType.CENTER, }),
+            //                                             ],
+            //                                         }),    
+            //                                     ]
+            //                                 })
+            //                             //    })
+            //                             ]
+                                            
+            //                         }), 
+            //                         // new TableCell({  
+            //                         //     width: { size: 100 / 3, type: WidthType.PERCENTAGE },
+            //                         // children: [new Paragraph({bold: true, text: item.price, heading: HeadingLevel.HEADING_3, alignment: AlignmentType.CENTER, })],
+            //                         // }),
+            //                         // new TableCell({  
+            //                         //     width: { size: 100 / 3, type: WidthType.PERCENTAGE },
+            //                         //     children: [new Paragraph({bold: true, text: item.quantity, heading: HeadingLevel.HEADING_3, alignment: AlignmentType.CENTER, })],
+            //                         // }),
+            //                         // new TableCell({  
+            //                         //     width: { size: 100 / 3, type: WidthType.PERCENTAGE },
+            //                         //     children: [new Paragraph({bold: true, text: 'P ' +this.separator_thousand(item.total) , heading: HeadingLevel.HEADING_3, alignment: AlignmentType.CENTER, })],
+            //                         // }),
+            //                     ],  
+            //                     });
+            //                 })
+            //             }) 
+                  
+                    
+                //const heading = ["Description", "Price","Quantity","Subtotal"];
                 // const total = ["","","","","", "Total Amount", 'P '+this.separator_thousand(item.total_amount)];
                 // const received = ["","", "Amount received", 'P '+this.separator_thousand(temp_data.payment_method.payment)];
                 // const balance = ["","", "Total Balance", 'P '+this.separator_thousand(temp_data.payment_method.balance)];
-                const header = this.heading(heading);
+                //const header = this.heading(heading);
                 // const _footer = this.footer(total);
                 // const _receive_footer = this.footer(received);
                 // const _balance_footer = this.footer(balance);
-                const title = new Paragraph({
-                children:[new TextRun({  
-                        text: "Stock - Out",
-                        heading: HeadingLevel.HEADING_1,
-                        bold:true,
-                        color:"140b05",
-                        size:"50",  
-                    }),], 
-                alignment: AlignmentType.RIGHT
-                }); 
+                // const title = new Paragraph({
+                // children:[new TextRun({  
+                //         text: "Stock - Out",
+                //         heading: HeadingLevel.HEADING_1,
+                //         bold:true,
+                //         color:"140b05",
+                //         size:"50",  
+                //     }),], 
+                // alignment: AlignmentType.RIGHT
+                // }); 
                 // const _sub_title = new Paragraph({
                 //     children: [ 
                 //         new TextRun({
@@ -291,15 +542,15 @@ export default {
                 //         }),
                 //         ],
                 //     });
-                const _sub_title4 = new Paragraph({
-                    children: [  
-                        new TextRun({
-                            text: "Date: "+ item.date, 
-                            size:"25"
-                        }),
-                        ],
-                        thematicBreak:true
-                    });
+                // const _sub_title4 = new Paragraph({
+                //     children: [  
+                //         new TextRun({
+                //             text: "Date: "+ item.date, 
+                //             size:"25"
+                //         }),
+                //         ],
+                //         thematicBreak:true
+                //     });
                 
                 doc.addSection({
                     properties: {},
@@ -308,24 +559,28 @@ export default {
                             children: [new Paragraph({text:"IDELLE'S", alignment: AlignmentType.RIGHT})],
                         }),
                     },
-                    children: [
-                    title,
+                    children: temp_data.map((item)=>{
+                            new TextRun({
+                            text:item.id, 
+                            size:"25"
+                        }) 
+                     })
+                    // title,
                     // _sub_title,
                     // _sub_title1,
                     // _sub_title2,
                     // _sub_title3,
-                    _sub_title4,
-                        header,
-                        table,
+                    //_sub_title4,
+                        //header,
+                        // table,
                         // _footer,
                         // _receive_footer,
                         // _balance_footer
-                    ],
+                    //],
                 });   
                 return doc;
         },
-        export_data_stockin(item,doc1){
-                // var temp_data = JSON.parse(item.data)
+        export_data_stockin(item,doc1){ 
                 const table = new Table({
                     rows: item.map((item)=>{
                         return new TableRow({
@@ -409,6 +664,7 @@ export default {
             }); 
             });
             this.invents = invent;
+            await this.select_dropdown();
             },
         async summary_stock_in(temp){
             console.log(temp)
@@ -502,8 +758,13 @@ export default {
         }
     },
     created(){
-        //this.temp_stock_out(); 
+        this.temp_stock_out();  
     },
+    computed:{
+        disbut(){
+            return (this.form.cost.length <= 0) || (this.form.desc.length <= 0)  
+        }
+    }
    
 }
 </script>

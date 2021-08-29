@@ -1,5 +1,5 @@
 <template> 
-    <div class="test">
+    <div class="stview">
        <div class="text-center" v-if="progress">
          <v-progress-circular 
             :size="70"
@@ -41,26 +41,24 @@
           <tr>
             <th class="text-left"><h2>Description</h2></th>
             <th class="text-left"><h2>Price</h2></th>
-            <th class="text-left"><h2>Qunatity</h2></th>
+            <th class="text-left"><h2>Qunatity</h2></th> 
             <th style="text-align:right;"><h2>Sub Total</h2></th> 
+            <th style="text-align:right;"><h2>Action</h2></th> 
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="item in items.product"
-            :key="item.name"
-            class="font-weight-regular"
-          >
+          <tr  v-for="item in items.product" :key="item.name"  class="font-weight-regular">
             <td>{{ item.name }}</td>
             <td>{{ item.price }}</td>
             <td>{{ item.quantity }}</td>
             <td style="text-align:right;"><h3>{{ 'P '+separator_thousand(item.total) }}</h3></td>  
+            <td style="text-align:right;"> <v-btn dark small color="red" @click="refund(item)"> Return  </v-btn></td>
           </tr>
           <tr>
             <td></td>
             <td></td>
             <td><h2>Total Amount</h2></td> 
-            <td><h2 style="text-align:right; text-decoration: underline;">{{ 'P '+separator_thousand(data[0].total_amount)}}</h2></td> 
+            <td><h2 style="text-align:right; text-decoration: underline;">{{ 'P '+separator_thousand(items.payment_method.total_amount)}}</h2></td> 
           </tr>
           <tr>
             <td></td>
@@ -81,6 +79,7 @@
     </div> 
 </template>
 <script>
+import forEach from "lodash/forEach";
 import axios from 'axios';
 import Helper from "../views/helper/helper.js";
 import { Document, Packer, Paragraph, Table,TableRow, TableCell, WidthType,HeadingLevel,AlignmentType,TextRun,Header } from "docx";
@@ -92,17 +91,49 @@ export default {
         data:{},
         items:[],
         progress:true,
-        payment_method:{}
+        payment_method:{},
+        selected:{
+          stockout_id:null,
+          data:{},
+          total_amount:null
+        }
     }),
 created(){
      this.get_data();
 },
 methods:{
+  refund(item){ 
+    this.items.product.splice(this.items.product.indexOf(item),1);
+    this.selected.stockout_id = this.$route.params.stockout_id;
+    this.selected.total_amount =  this.reCompute();
+    this.selected.data = JSON.stringify(this.items);
+    this._update_stockout();
+  },
+  _update_stockout(){  
+      axios.put(this.ipaddress+"/api/editstockout", this.selected).then((response) => {
+           console.log(response);
+           this.toast('Successfully return!','info'); 
+        })
+        .catch((error) => {
+          console.log("Error in " + error); 
+           this.dialog.edit = false;  
+        });
+    },
+  reCompute(){
+    let total = 0; 
+    forEach(this.items.product, (item)=>{
+      total = item.total + total;
+    })
+    this.items.payment_method.total_amount = total;
+    this.items.payment_method.balance = total - parseInt(this.items.payment_method.payment); 
+    return total;
+  },
     async get_data(){
         let id = this.$route.params.stockout_id;
         let temp = await axios.get(this.ipaddress+'/api/stockoutview/'+id);
         this.data = temp.data;
         this.items = JSON.parse(this.data[0].data); 
+        this.items.payment_method.total_amount = parseInt(this.data[0].total_amount);
         this.progress = false
     },
     export_data(){ 
@@ -226,13 +257,10 @@ methods:{
 }
 </script>
 <style>
-.test { 
-  margin-right: 400px;    
-  border-style: solid;
-  border-color: coral;
-}
-.test{
-    margin:100px;
+ 
+.stview{
+    padding:10px;
+    height: 100%;
     background-color: white !important;
 }
 p{

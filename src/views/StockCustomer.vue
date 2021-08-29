@@ -1,6 +1,5 @@
-<template>
-    <div class="stockCus">
-    <div class="test"> 
+<template> 
+    <div class="stockCus"> 
        <div class="text-center" v-if="progress">
          <v-progress-circular 
             :size="70"
@@ -9,7 +8,7 @@
             indeterminate
           ></v-progress-circular>
        </div>
-        <v-container v-else> 
+        <div v-else> 
             <div> 
                 <v-card class="d-flex mb-6"  flat tile > 
                  <h1>Customer History</h1> 
@@ -30,7 +29,8 @@
                         <th><h2>Amount Received</h2></th> 
                         <th style="text-align:right;"><h2>Balance</h2></th> 
                         <th style="text-align:right;"><h2>Action</h2></th> 
-                        <th ><h2>Delete</h2></th>
+                        <th style="text-align:right;"><h2>Open</h2></th> 
+                        <!-- <th ><h2>Delete</h2></th> -->
                     </tr>
                     </thead>
                     <tbody>
@@ -47,12 +47,15 @@
                         <td style="text-align:right;"><h3>{{ 'P ' +balance(item) }}</h3></td>  
                         <td  style="text-align:right;"> <v-btn dark small color="cyan" @click="open_payment(item)" :disabled="balance(item) === '0'">
                             Pay
-                        </v-btn>  
+                        </v-btn>   
                         </td>
                         <td>
-                        <v-btn dark small color="red" @click="open_delete(item)">
-                            Delete
-                        </v-btn>
+                        <!-- <v-btn dark small color="red" @click="open_delete(item)">
+                            Return
+                        </v-btn> -->
+                        <v-btn dark small color="red" route :to="{name: 'Stockoutview', params: {stockout_id: item.stockout_id}}">
+                                View
+                            </v-btn>
                         </td>
                     </tr> 
                     <tr>
@@ -67,7 +70,7 @@
                 </template>
             </v-simple-table> 
             <center v-else><h2> No History </h2></center>
-        </v-container>
+        </div>
        <v-row>
             <v-dialog v-model="dialog.payment" persistent max-width="500px">
             <v-card>
@@ -132,7 +135,7 @@
                 </v-card>
             </v-dialog>
             </v-row>
-    </div> 
+    
     </div>
 </template>
 <script>
@@ -316,15 +319,13 @@ methods:{
   border-color: coral; 
   background-color:white;
 }
-.test{
-    margin:100px; 
+.stockCus{ 
+    padding: 10px;
+    height: 100%;
     background-color: white !important;
 }
 p{
   font-size: 20px;
 }
-.stockCus{
-      height: 100%;
-  background: white;
-}
+ 
 </style>

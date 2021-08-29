@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="content">
     <div>
       <v-card class="d-flex mb-6" flat tile>
         <h1 class="ml-5 mr-auto">USERS</h1>
@@ -205,3 +205,9 @@ export default {
     }
 };
 </script>
+<style>
+.content{
+  background: white;
+}
+
+</style>

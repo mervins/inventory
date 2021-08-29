@@ -562,7 +562,7 @@ export default {
       sellingprice: "", 
     },
     select: {},
-    stockIn:{ 
+    stockIn:{  
       name:"",
       quantity:"",
       price:"",
@@ -722,7 +722,7 @@ export default {
         this.stockInData.push(temp_data);
         forEach(this.stockInData , (item)=>{
           this.total_amount = item.total + this.total_amount;
-        })
+        }) 
         this.stockIn.quantity=''
         this.stockIn.price=''; 
         this.stockIn.total=0
@@ -834,7 +834,7 @@ export default {
         return (this.form.description.length <= 0) || (this.form.price.length <= 0) || (this.form.measure.length <= 0) || (this.form.sellingprice.length <= 0);
       },
     addItems(){ 
-      return (this.stockIn.product_id.length <= 0) || (this.stockIn.price.length <= 0) || (this.stockIn.quantity.length <= 0) ;
+      return (this.stockIn.product_id.length <= 0) || (this.stockIn.price.length <= 0) || (this.stockIn.quantity.length <= 0) || (this.stockInfo.supplier_id <= 0) || (this.stockInfo.track_id <= 0) ;
     },
      addStockout(){ 
       return (this.stockIn.product_id.length <= 0) || (this.stockIn.price.length <= 0) || (this.stockIn.quantity.length <= 0);
