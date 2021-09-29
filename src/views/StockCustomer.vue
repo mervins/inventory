@@ -222,8 +222,8 @@ methods:{
         });
     },
     pay_button(){
-        if(this.amount_pay_off > this.payment_method.balance){ 
-          this.toast('Something went wrong','error'); 
+        if(this.amount_pay_off > this.payment_method.balance || this.amount_pay_off <= 0){ 
+          this.toast('Check your payment','error'); 
         }else{  
             let temp = JSON.parse(this.selected.data);
             console.log(temp)

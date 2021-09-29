@@ -51,7 +51,15 @@
       <span class="hidden-sm-and-down">IDELLE'S</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn v-on:click="logout" class="clickable" normal>Logout</v-btn>
+      <div v-if="temp_json.show_drawer">
+        <v-btn v-on:click="logout" class="clickable" normal>Logout</v-btn>
+      </div>
+      <div v-else>
+        <v-btn v-on:click="logout" class="clickable mr-2" normal>Cashiering</v-btn>
+        <v-btn v-on:click="logout" class="clickable mr-2" normal>Inventory</v-btn>
+      </div>
+        
+        
     </v-app-bar>
     <v-content> 
       <router-view></router-view>
@@ -83,10 +91,11 @@ export default {
       {icon: 'mdi-home', text: 'Dashboard', route:'/dashboard'},
       {icon: 'mdi-briefcase-download', text:'Inventory', route:'/inventory',model:false,}, {
         icon: 'mdi-chevron-up', 'icon-alt':'mdi-chevron-down',
-        'icon-ctr':'mdi-finance', text:'Stocks', model:false,
+        'icon-ctr':'mdi-finance', text:'Transaction', model:false,
         children:[
           {icon:' mdi-plus-box', text:'Stock - In', route:'/stockin'},
-          {icon:' mdi-minus-box', text:'Stock - Out', route:'/stockout'}
+          {icon:' mdi-minus-box', text:'Stock - Out', route:'/stockout'},
+           {icon:' mdi-keyboard-return', text:'Return', route:'/return'}
         ]
       },
       {icon: 'mdi-contrast-circle', text:'Aging', route:'/aging',model:false,}, 

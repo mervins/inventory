@@ -3,14 +3,22 @@
     <div> 
     <v-card class="d-flex"  flat tile > 
       <h1  class="ml-5 mr-auto item-center">Stock-Out</h1>   
-      <v-row class="ml-3">
+      <!-- <v-row class="ml-3">
         <v-col cols="12" md="3">
             <v-select :items="totalPages" label="Stock per Page" outlined v-model="current_page" @change="getdata">
             </v-select>
         </v-col> 
-      </v-row> 
+      </v-row>  -->
     </v-card>  
-  </div>    
+  </div> 
+  <div class="text-center">
+    <v-pagination
+      @input="getdata"
+      v-model="current_page"
+      :length="totalPages.length-1"
+      circle
+    ></v-pagination>
+  </div>   
   <v-simple-table fixed-header>
       <template v-slot:default>
         <thead>
@@ -29,14 +37,36 @@
             <td>{{ item.Customer.name }}</td>
             <td>{{ item.total_amount }}</td> 
             <td> 
-              <v-btn depressed route :to="{name: 'Stockoutview', params: {stockout_id: item.stockout_id}}" class="mt-1 ml-2 mr-2">
-              Open
-            </v-btn>
+              <v-btn depressed route :to="{name: 'Stockoutview', params: {stockout_id: item.stockout_id}}" class="mt-1 ml-2 mr-2" color="primary">
+                Open
+              </v-btn>
+              <v-btn depressed @click="delete_war(item)" class="mt-1 ml-2 mr-2" color="error">
+              Delete
+              </v-btn>
             </td> 
           </tr>
         </tbody>
       </template>
-    </v-simple-table>  
+    </v-simple-table> 
+    <v-row justify="center">
+            <v-dialog v-model="dialog.delete" persistent max-width="390"> 
+            <v-card>
+                <v-card-title class="text-h6">
+                    Are you sure you want to delete?
+                </v-card-title> 
+                <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="green darken-1" text @click="dialog.delete = false">
+                    Disagree
+                </v-btn>
+                <v-btn color="green darken-1" text @click="deleteTrans()">
+                    Agree
+                </v-btn>
+                </v-card-actions>
+            </v-card>
+            </v-dialog>
+        </v-row> 
+    
   </div>
 </template>
   <script>
@@ -65,13 +95,13 @@ export default {
     stockout:[],
     data:{},
     totalPages:[],
-    current_page:0
+    current_page:1
   }),
   methods:{ 
       async getdata(){ 
-        let temp_data =  await axios.get(this.ipaddress+'/api/stockout?page='+this.current_page+'&size=10');
-        this.stockout = temp_data.data.rows;  
-        console.log(temp_data.data);
+        let temp_data =  await axios.get(this.ipaddress+'/api/stockout?page='+(this.current_page-1)+'&size=15');
+        this.stockout = temp_data.data.rows; 
+        this.totalPages=[];  
         let data_temp = temp_data.data; 
         for(let x = 0; x <= data_temp.totalPages; x++){
             this.totalPages.push(x);
@@ -87,11 +117,22 @@ export default {
     },
     delete_war(item){
       this.dialog.delete = true;
-      this.selected = this.assign(item)
+      this.selected = item
+    },
+    async deleteTrans(){
+      let temp_data =  await axios.delete(this.ipaddress+'/api/deletestockout/' +this.selected.id); 
+      if(temp_data.data == 'success'){ 
+        const data = this.stockout.indexOf(this.selected);
+        this.stockout.splice(data,1); 
+        this.dialog.delete = false;
+        this.toast('Success deleted','error');
+      }else{
+        this.toast('Something went wrong','error');
+      }
+      
     },
   },
-  created(){
-    // let temp_data =  axios.get('http://127.0.0.1:3308/api/customer');
+  created(){ 
     this.getdata()  
   }
 };

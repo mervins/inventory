@@ -13,7 +13,7 @@
           <!-- <center><h1>IDDEL'S</h1></center> -->
             <v-card flat class="pl-2 pr-2 login">
               <v-card-title primary-title center>
-                <center><h2>Login</h2></center>
+                <center><h2 class="black--text">Login Inventory</h2></center>
               </v-card-title>
               <v-form>
                 <v-text-field

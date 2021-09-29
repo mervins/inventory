@@ -33,7 +33,10 @@
                     </v-date-picker>
                 </v-menu>
                 </v-col>
-           </v-row>
+           </v-row> 
+           <!-- <div class="d-flex flex-row-reverse">
+              <v-btn class="pa-2 ma-2 "  color="primary" @click="_update_stockout"> Save  </v-btn>
+           </div>  -->
            <hr>
             <v-simple-table fixed-header height="500px">
       <template v-slot:default>
@@ -75,7 +78,44 @@
         </tbody>
       </template>
     </v-simple-table> 
-        </v-container>
+    </v-container>
+    <v-row>
+      <v-dialog v-model="dialog.edit" persistent max-width="1000px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Return Product</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12" md="4">
+                  <v-text-field label="Customer" required disabled type="text" v-model="selected.customer"></v-text-field>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-text-field label="Product*" disabled v-model="selected.name"></v-text-field>
+                </v-col>
+                <v-col cols="12" md="4" >
+                  <v-text-field label="Quantity" persistent-hint type="number"  required v-model="selected.quantity"></v-text-field>
+                </v-col> 
+                <v-col cols="12" sm="8">
+                  <v-text-field label="Reason to return" persistent-hint required v-model="selected.reason"></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="4">
+                  <v-text-field label="Receiver" persistent-hint required v-model="selected.receiver"></v-text-field>
+                    </v-col> 
+              </v-row>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="dialog.edit = false">
+              Close
+            </v-btn>
+            <v-btn color="blue darken-1" text @click="_addReturn"> Save </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
     </div> 
 </template>
 <script>
@@ -94,25 +134,46 @@ export default {
         payment_method:{},
         selected:{
           stockout_id:null,
+          total_amount:null
+        },
+        form:{
+          stockout_id:null,
           data:{},
           total_amount:null
+        },
+        dialog:{
+          edit:false
+        },
+        value:{
+          max:0,
+          min:0
         }
     }),
 created(){
      this.get_data();
 },
 methods:{
-  refund(item){ 
-    this.items.product.splice(this.items.product.indexOf(item),1);
-    this.selected.stockout_id = this.$route.params.stockout_id;
-    this.selected.total_amount =  this.reCompute();
-    this.selected.data = JSON.stringify(this.items);
-    this._update_stockout();
+  setMax(){
+    if(this.selected.quantity > this.value.max){
+      this.selected.quantity = this.value.max
+    }
   },
-  _update_stockout(){  
-      axios.put(this.ipaddress+"/api/editstockout", this.selected).then((response) => {
+  refund(item){ 
+    this.dialog.edit = true;
+    this.selected = this.assign(item);
+    Object.assign(this.selected,{customer:this.data[0].Customer.name}) 
+    this.value.max = this.selected.quantity; 
+    console.log(this.selected);
+    // this.items.product.splice(this.items.product.indexOf(item),1);
+    // this.selected.stockout_id = this.$route.params.stockout_id;
+    // this.selected.total_amount =  this.reCompute();
+    // this.selected.data = JSON.stringify(this.items); 
+    // this._update_stockout();
+  },
+  _addReturn(){  
+      axios.put(this.ipaddress+"/api/addReturn", this.selected).then((response) => {
            console.log(response);
-           this.toast('Successfully return!','info'); 
+           this.toast('Successfully returned!','info'); 
         })
         .catch((error) => {
           console.log("Error in " + error); 
@@ -123,9 +184,11 @@ methods:{
     let total = 0; 
     forEach(this.items.product, (item)=>{
       total = item.total + total;
-    })
-    this.items.payment_method.total_amount = total;
-    this.items.payment_method.balance = total - parseInt(this.items.payment_method.payment); 
+    }) 
+    var tempBal = total - parseInt(this.items.payment_method.payment);  
+    this.items.payment_method.balance = tempBal > 0 ? tempBal : 0;
+    this.items.payment_method.payment = total;
+    this.items.payment_method.total_amount = total; 
     return total;
   },
     async get_data(){
@@ -136,11 +199,8 @@ methods:{
         this.items.payment_method.total_amount = parseInt(this.data[0].total_amount);
         this.progress = false
     },
-    export_data(){ 
-        // Create document
-        const doc = new Document(); 
-        // Documents contain sections, you can have multiple sections per document, go here to learn more about sections
-        // This simple example will only contain one section
+    export_data(){  
+        const doc = new Document();  
             const table = new Table({
                 rows: this.items.product.map((item)=>{
                     return new TableRow({

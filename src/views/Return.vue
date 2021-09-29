@@ -2,7 +2,7 @@
   <div class="stockin">
     <div class="text-center"> 
     <v-card class="d-flex"  flat tile > 
-      <h1  class="ml-5 mr-auto item-center">Stock-In</h1>  
+      <h1  class="ml-5 mr-auto item-center">Retrun Product</h1>  
     </v-card> 
   </div>    
   <div class="text-center">
@@ -18,9 +18,12 @@
         <thead>
           <tr> 
             <th class="text-left"><h2>Date</h2></th>
-            <th class="text-left"><h2>Panel Name</h2></th>
-            <th class="text-left"><h2>Supplier Name</h2></th>
-            <th class="text-left"><h2>Total Amount</h2></th> 
+            <th class="text-left"><h2>Customer</h2></th>
+            <th class="text-left"><h2>Reciever</h2></th>
+            <th class="text-left"><h2>Product</h2></th> 
+            <th class="text-left"><h2>Quantity</h2></th>  
+            <th class="text-left"><h2>Reason</h2></th> 
+            <th class="text-left"><h2>Status</h2></th> 
             <th class="text-left"><h2>Action</h2></th> 
           </tr>
         </thead>
@@ -30,13 +33,19 @@
             <td>{{ item.Track.name }}</td>
             <td>{{ item.Supplier.name }}</td>
             <td>{{ item.total_amount }}</td> 
+            <td></td>
+            <td></td>
+            <td>Pending</td>
             <td> 
-              <v-btn depressed route :to="{name: 'Stockinview', params: {stockin_id: item.stockin_id}}" class="mt-1 ml-2 mr-2" color="primary">
-              Open
-            </v-btn>
-            <v-btn depressed @click="delete_war(item)" class="mt-1 ml-2 mr-2" color="error">
-              Delete
-              </v-btn>
+                <v-btn depressed route class="mt-1 ml-2 mr-2" color="primary">
+                    Retun to inventory
+                </v-btn>
+                <v-btn depressed route class="mt-1 ml-2 mr-2" color="warning">
+                    Loss
+                </v-btn>
+                <v-btn depressed @click="delete_war(item)" class="mt-1 ml-2 mr-2" color="error">
+                Delete
+                </v-btn>
             </td> 
           </tr>
         </tbody>
@@ -59,7 +68,7 @@
             </v-card-actions>
         </v-card>
         </v-dialog>
-  </v-row>  
+    </v-row> 
   </div>
 </template>
   <script>
@@ -94,9 +103,19 @@ export default {
      page: 1,
   }),
   methods:{ 
+       _update_stockout(){  
+        axios.put(this.ipaddress+"/api/editstockout", this.selected).then((response) => {
+           console.log(response);
+           this.toast('Successfully returned!','info'); 
+        })
+        .catch((error) => {
+          console.log("Error in " + error); 
+           this.dialog.edit = false;  
+        });
+    },
       async getdata(){ 
         this.totalPages=[]
-        let temp_data =  await axios.get(this.ipaddress+'/api/stockin?page='+(this.current_page-1)+'&size=15');
+        let temp_data =  await axios.get(this.ipaddress+'/api/returns?page='+(this.current_page-1)+'&size=15');
         this.stockin = temp_data.data.rows; 
         console.log(temp_data.data)
         let data_temp = temp_data.data;  

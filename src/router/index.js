@@ -97,6 +97,12 @@ const routes = [{
         component: () =>
             import ( /* webpackChunkName: "about" */ '../views/login/user_list.vue')
     },
+    {
+        path: '/return',
+        name: 'User',
+        component: () =>
+            import ( /* webpackChunkName: "about" */ '../views/Return.vue')
+    },
 ]
 
 const router = new VueRouter({
