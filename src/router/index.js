@@ -1,23 +1,20 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 //import Home from '../views/Home.vue'
-import Login from '../views/login/login.vue'
+// import Login from '../views/login/login.vue'
 
 Vue.use(VueRouter)
 
 const routes = [{
         path: '/',
         name: 'Login',
-        component: Login
+        // component: Login
+        component: () => import ( /* webpackChunkName: "about" */ '../views/login/login.vue')
     },
     {
         path: '/dashboard',
         name: 'Dashboard',
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () =>
-            import ( /* webpackChunkName: "about" */ '../views/Dashboard.vue')
+        component: () => import ( /* webpackChunkName: "about" */ '../views/Dashboard.vue')
     },
     {
         path: '/inventory',
@@ -99,14 +96,44 @@ const routes = [{
     },
     {
         path: '/return',
-        name: 'User',
+        name: 'Return',
         component: () =>
             import ( /* webpackChunkName: "about" */ '../views/Return.vue')
+    },
+    {
+        path: '/category',
+        name: 'Category',
+        component: () =>
+            import ( /* webpackChunkName: "about" */ '../views/cashier/Category.vue')
+    },
+    {
+        path: '/table',
+        name: 'Table',
+        component: () =>
+            import ( /* webpackChunkName: "about" */ '../views/cashier/Table.vue')
+    },
+    {
+        path: '/product',
+        name: 'Product',
+        component: () =>
+            import ( /* webpackChunkName: "about" */ '../views/cashier/Product.vue')
+    },
+    {
+        path: '/order',
+        name: 'Order',
+        component: () =>
+            import ( /* webpackChunkName: "about" */ '../views/cashier/Order.vue')
+    },
+    {
+        path: '/billing',
+        name: 'Billing',
+        component: () =>
+            import ( /* webpackChunkName: "about" */ '../views/cashier/Billing.vue')
     },
 ]
 
 const router = new VueRouter({
-    mode: 'history',
+    mode: 'hash',
     base: process.env.BASE_URL,
     routes
 })

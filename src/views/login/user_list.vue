@@ -205,8 +205,10 @@ export default {
     }
 };
 </script>
-<style>
+<style> 
+
 .content{
+  height: 100%;
   background: white;
 }
 

@@ -164,7 +164,7 @@
               <v-btn fab dark small color="cyan" @click="_open_edit(item)">
                 <v-icon dark> mdi-pencil </v-icon>
               </v-btn>
-              <v-btn
+              <v-btn  v-if="user.type == 'Administrator'"
                 class="mx-2"
                 fab
                 dark
@@ -254,7 +254,7 @@ export default {
     },
     delete_track() {
       axios
-        .delete("http://127.0.0.1:3308/api/deleteTrack/" + this.selected.id)
+        .delete(this.ipaddress + "/api/deleteTrack/" + this.selected.id)
         .then((response) => {
           console.log(response);
           this.track.splice(

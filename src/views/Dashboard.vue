@@ -1,60 +1,7 @@
 <template>
   <div class="about" v-if="!loading">
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
-    <v-card>
-      <!-- <v-container >
-        <v-row style="margin:90px">
-          <v-col cols="12" md="4"  v-if="temp_json.data.type == 'Administrator'">
-            <v-card  class="mx-auto buttons" max-width="344" max-height="344" route :to="'/alluser'"> 
-                <v-img
-                  height="250"
-                  src="../assets/user.png"
-                ></v-img>
-          </v-card>
-          </v-col>
-          <v-col cols="12" md="4" >
-            <v-card  class="mx-auto buttons" max-width="344" max-height="344" route :to="'/inventory'"> 
-                <v-img
-                  height="250"
-                  src="../assets/inventory.png" 
-                ></v-img>
-          </v-card>
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-card  class="mx-auto buttons" max-width="344" max-height="344" route :to="'/supplier'"> 
-                <v-img
-                  height="250"
-                  src="../assets/supplier.png"
-                ></v-img>
-          </v-card>
-          </v-col>
-          <v-spacer></v-spacer>
-          <v-col cols="12" md="4" >
-            <v-card  class="mx-auto buttons" max-width="344" max-height="344" route :to="'/customer'"> 
-                <v-img
-                  height="250"
-                  src="../assets/cunsomer.png"
-                ></v-img>
-          </v-card>
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-card  class="mx-auto buttons" max-width="344" max-height="344" route :to="'/report'"> 
-                <v-img
-                  height="250"
-                  src="../assets/report.png" 
-                ></v-img>
-          </v-card>
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-card  class="mx-auto buttons" max-width="344" max-height="344" route :to="'/aging'"> 
-                <v-img
-                  height="250"
-                  src="../assets/aging.png"
-                ></v-img>
-          </v-card>
-          </v-col>
-        </v-row>
-      </v-container> -->
+    <v-card> 
     </v-card> 
     <!-- <salesChart></salesChart>   -->
     <v-card class="ml-5 mr-5">
@@ -79,14 +26,14 @@
                     </v-date-picker>
                 </v-dialog></v-card>
             </div> 
-            <apexcharts width="1000" height="350" type="bar" :options="chartOptions" :series="series"></apexcharts>
+            <VueApexCharts width="900" height="350" type="bar" :options="chartOptions" :series="series"></VueApexCharts>
         </v-card>
       </v-col>
       <v-col cols="12" md="4">
-        <v-card class="mx-auto outlined pl-5 text-center">
+        <v-card>
           <h2>Daily Inventory Average</h2>
           <div id="chart">
-              <apexcharts type="pie" width="380" :options="chartOptionsPie" :series="seriesPie"></apexcharts>
+              <VueApexCharts type="pie" width="380" :options="chartOptionsPie" :series="seriesPie"></VueApexCharts>
           </div>
         </v-card>
       </v-col>
@@ -134,7 +81,7 @@ export default {
   mixins:[Helper],
   components: {
     //HelloWorld
-    apexcharts: VueApexCharts,
+    VueApexCharts,
    
   },
   data:()=>({ 
@@ -158,7 +105,7 @@ export default {
         name: 'series-1',
         data: [0, 0, 0, 0, 0, 0, 0]
       }],
-      seriesPie: [0,0],
+      seriesPie: [100,0],
       chartOptionsPie: {
         chart: {
           width: 380,
@@ -333,10 +280,7 @@ export default {
       this.initialize(new Date(this.date))
       this.modal = false
     },
-     add_user(){ 
-      let temp_data =  axios.post('http://127.0.0.1:3308/api/new', this.form);
-      this.user = temp_data; 
-    }
+      
   }
 }
 </script>

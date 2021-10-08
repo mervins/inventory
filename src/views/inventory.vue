@@ -99,7 +99,7 @@
               <v-btn dark small color="cyan" @click="open_edit(item)">
                 Edit
               </v-btn>
-              <v-btn class="mx-2" dark small color="red" @click="delete_war(item)" v-if="temp_json.data.type == 'Administrator'">
+              <v-btn class="mx-2" dark small color="red" @click="delete_war(item)" v-if="user.type == 'Administrator'">
                 Delete
               </v-btn> 
             </td> 
@@ -123,13 +123,13 @@
                 <v-col cols="12" md="4">
                   <v-text-field label="Description*" v-model="select.description" ></v-text-field>
                 </v-col>
-                <v-col cols="12" md="4" v-if="temp_json.data.type == 'Administrator'">
+                <v-col cols="12" md="4" v-if="user.type == 'Administrator'">
                   <v-text-field label="Price*" persistent-hint type="number" v-model="select.price" required></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field label="Stock*"  type="number" v-model="select.stock" disabled required></v-text-field>
                 </v-col>
-                <v-col cols="12" sm="4" v-if="temp_json.data.type == 'Administrator'">
+                <v-col cols="12" sm="4" v-if="user.type == 'Administrator'">
                   <v-text-field label="Selling Price*" persistent-hint required v-model="select.sellingprice" type="number"></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="4">
@@ -192,8 +192,7 @@ import indexOf from "lodash/indexOf";
 import find from "lodash/find";
 import Vue from 'vue';
 import axios from 'axios';
-import Helper from "../views/helper/helper.js";
-import json from "./helper/weather.json";
+import Helper from "../views/helper/helper.js"; 
 import StockIn from "./inventory/stockIn.vue";
 import StockOut from "./inventory/stockout.vue";
 export default {
@@ -202,8 +201,7 @@ export default {
     StockIn,
     StockOut
   },
-  data: () => ({ 
-    temp_json:json,
+  data: () => ({  
     dialog: {
       create: false,
       edit: false,

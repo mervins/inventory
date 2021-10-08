@@ -46,7 +46,7 @@
             <th class="text-left"><h2>Price</h2></th>
             <th class="text-left"><h2>Qunatity</h2></th> 
             <th style="text-align:right;"><h2>Sub Total</h2></th> 
-            <th style="text-align:right;"><h2>Action</h2></th> 
+            <!-- <th style="text-align:right;"><h2>Action</h2></th>  -->
           </tr>
         </thead>
         <tbody>
@@ -55,7 +55,7 @@
             <td>{{ item.price }}</td>
             <td>{{ item.quantity }}</td>
             <td style="text-align:right;"><h3>{{ 'P '+separator_thousand(item.total) }}</h3></td>  
-            <td style="text-align:right;"> <v-btn dark small color="red" @click="refund(item)"> Return  </v-btn></td>
+            <!-- <td style="text-align:right;"> <v-btn dark small color="red" @click="refund(item)"> Return  </v-btn></td> -->
           </tr>
           <tr>
             <td></td>

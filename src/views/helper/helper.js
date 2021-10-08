@@ -2,8 +2,13 @@ import axios from 'axios';
 import { Paragraph, Table, TableRow, TableCell, WidthType, HeadingLevel, AlignmentType, TextRun } from "docx";
 export default {
     data: () => ({
-        ipaddress: 'http://127.0.0.1:3308'
+        ipaddress: 'http://127.0.0.1:3308',
+        user:{}
     }),
+    created(){
+        this.user = JSON.parse(localStorage.getItem('user'));
+        console.log(this.user);
+    },
     methods: {
         toast(msg, type) {
             this.$toast(msg, {

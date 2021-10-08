@@ -221,20 +221,23 @@ export default ({
                             countQnt = parseInt(item.quantity) + parseInt(this.stockOut.quantity); 
                             if(stock_available > countQnt){
                                 item.quantity = countQnt; 
-                                item.total = parseInt(countQnt * this.stockOut.price);
+                                item.total = parseInt(countQnt * this.stockOut.price); 
                             }
                             else{
                                 this.$parent.toast('Insufficient Stock','error');
                             } 
                             }
-                        })
+                        });
+                        forEach(this.stockOutData , (item)=>{
+                            this.total_amount = item.total + this.total_amount;
+                        }) 
                     }else{
                       this.stockOutPush(stock_available);  
                     }
                     
                 }else if(this.stockOutData.length <= 0){
                     this.stockOutPush(stock_available);
-                }
+                } 
                 
             },
             stockOutPush(stock_available){
@@ -267,6 +270,7 @@ export default ({
                 })
                     this.totalGetPerItem(this.stockOut.product_id,stock_available)
                 },
+
         async update_stock_in_product(product){  
             axios.put(this.$parent.ipaddress+"/api/editProduct", product).then((response) => { 
             console.log(response.data); 

@@ -1,12 +1,6 @@
 <template>
   <div>
-    <v-dialog
-      v-model="dialog"
-      persistent
-      max-width="600px"
-      min-width="360px"
-      :retain-focus="false"
-    >
+    <v-dialog v-model="dialog" persistent max-width="600px"  min-width="360px" :retain-focus="false">
       <div>
         <div style="text-align: center; color:white; background:#2C3A47">
           <h1 class="">LOGIN</h1>
@@ -23,11 +17,7 @@
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
-                  <v-text-field
-                    v-model="loginPassword"
-                    :append-icon="show1 ? 'eye' : 'eye-off'"
-                    :rules="[rules.required, rules.min]"
-                    :type="show1 ? 'text' : 'password'"
+                  <v-text-field v-model="loginPassword" :append-icon="show1 ? 'eye' : 'eye-off'" :rules="[rules.required, rules.min]" :type="show1 ? 'text' : 'password'"
                     name="input-10-1"
                     label="Password"
                     hint="At least 8 characters"

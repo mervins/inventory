@@ -1,54 +1,46 @@
-<template>
-  <div id="app" class="body_bg">
-    <v-container>
-      <v-layout row class="text-xs-center" style="margin-top:90px;">
-        <v-flex xs4>
-          <!-- <v-card height="500px"></v-card> -->
-        </v-flex>
-        <v-flex xs4 class=" lighten-4"  style="height:400px">
-          <v-container
-            style="position: relative; top: 2%"
-            class="text-xs-center"
-          >
-          <!-- <center><h1>IDDEL'S</h1></center> -->
-            <v-card flat class="pl-2 pr-2 login">
-              <v-card-title primary-title center>
-                <center><h2 class="black--text">Login Inventory</h2></center>
-              </v-card-title>
-              <v-form>
-                <v-text-field
-                  name="Username"
-                  label="Username"
-                  v-model="form.username"
-                  :rules='loginRules'
-                ></v-text-field>
-                <v-text-field
-                  name="Password"
-                  label="Password"
-                  type="password"
-                  v-model="form.password"
-                  :rules='password'
-                ></v-text-field>
-                <v-card-actions>
-                  <v-btn primary large block @click="login" :disabled="isDisable">Login</v-btn>
-                </v-card-actions>
-              </v-form>
-            </v-card>
-          </v-container>
-        </v-flex>
-        <!-- <v-img src="../../assets/bg.jpg" alt="admin" class="mx-auto"/> -->
-      </v-layout>
-    </v-container>
-  </div>
+<template> 
+    <div class="mer_bg">
+      <v-container>
+        <v-layout row class="text-xs-center" style="margin-top:90px;">
+          <v-flex xs4>
+            <!-- <v-card height="500px"></v-card> -->
+          </v-flex>
+          <v-flex xs4 class=" lighten-4"  style="height:400px">
+            <v-container
+              style="position: relative; top: 2%"
+              class="text-xs-center"
+            >
+            <!-- <center><h1>IDDEL'S</h1></center> -->
+              <v-card flat class="pl-2 pr-2 mer_login">
+                <div class="mer_center">
+                  <div ><h1 class="mer_title">Login Inventory</h1></div>
+                </div>
+                <div class="osmer-form">
+                  <v-form>
+                  <v-text-field  name="Username" label="Username" v-model="form.username" :rules='loginRules'></v-text-field>
+                  <v-text-field  name="Password" label="Password" type="password" v-model="form.password" :rules='password'></v-text-field>
+                  <v-card-actions>
+                    <v-btn primary large block @click="login" :disabled="isDisable">Login</v-btn>
+                  </v-card-actions>
+                </v-form>
+                </div>
+              </v-card>
+            </v-container>
+          </v-flex>
+          <!-- <v-img src="../../assets/bg.jpg" alt="admin" class="mx-auto"/> -->
+        </v-layout>
+      </v-container>
+    </div> 
 </template>
 <script>
 import axios from 'axios';
-import json from "../helper/weather.json";
+// import json from "../helper/weather.json";
 import Helper from "../helper/helper.js";
 export default {
+    emits: ['login_return'],
     mixins:[Helper],
     data:()=>({
-        temp_json:json,
+        // temp_json:json,
         form:{
           username:"",
           password:""
@@ -62,7 +54,6 @@ export default {
     methods:{
         login(){
                axios.post(this.ipaddress+'/api/login', this.form).then((response)=>{
-                     console.log(response);
                      this.data = response; 
                      if(this.data.data === ""){
                      this.toast('Login Failed','error'); 
@@ -70,13 +61,18 @@ export default {
                       this.toast('Server Error','error');
                      }
                      else{
-                     this.temp_json.show_drawer = true;
-                     this.temp_json.data = response.data;
-                     this.toast('Successfully added!','info'); 
-                     this.$router.push({
-                        name: "Dashboard",
-                      });
-                     }
+                      localStorage.setItem('isLoggedIn', true);
+                      localStorage.setItem('user', JSON.stringify(response.data));
+                      this.$parent.isLoggedIn = true
+                      this.temp_json = JSON.parse(localStorage.getItem('user'));
+                      console.log(this.$parent.isLoggedIn)
+                      // var codidtion = true;
+                      // this.$emit('login_return', {codidtion});
+                      this.toast('Successfully added!','info'); 
+                      this.$router.push({
+                          name: "Dashboard",
+                        }).catch(()=>{});
+                      }
                  });
         }
     },
@@ -88,16 +84,38 @@ export default {
 };
 </script>
 <style>
-.v-main__wrap{
-background: url('../../assets/bg.jpg');
-  ;
+
+.mer_title{
+  color:black; 
+  padding:1vmin;
+}
+.mer_center{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mer_bg{
+background: url('../../assets/bg.jpg'); 
   background-repeat: no-repeat;
    background-position: center center;
    background-attachment: fixed;
    background-size: cover;
 }
-.login{
-   background-color: rgba(231, 229, 229, 0.8) !important;
+.mer_login{
+   background-color: rgba(231, 229, 229, 0.95) !important;
    color: white !important;
 }
+
+.mer_bg {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        bottom: 0px;
+        right: 0px;
+        /* background-color: rgba(0, 0, 0, 0.3); */
+        animation: erl-anim-fade 0.3s;
+    }
+  .osmer-form{
+    padding: 2vmin;
+  }
 </style>

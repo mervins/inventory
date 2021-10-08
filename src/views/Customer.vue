@@ -149,7 +149,7 @@
                 <v-btn fab dark small color="cyan" @click="_open_edit(item)">
                   <v-icon dark> mdi-pencil </v-icon>
                 </v-btn>
-                <v-btn class="mx-2" fab dark small color="red" @click="delete_war(item)">
+                <v-btn class="mx-2" fab dark small color="red" @click="delete_war(item)" v-if="user.type == 'Administrator'">
                   <v-icon dark> mdi-delete </v-icon>
                 </v-btn>
               </td> 
